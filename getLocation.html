@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Current Location Finder</title>
+  </head>
+  <body>
+    <p class="para"></p>
+    <button onclick="getUserLocation()"> Get Address </button>
+  </body>
+  <script>
+    const para = document.querySelector(".para");
+
+    function getUserLocation() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+        //   console.log("Lat:- ", position.coords.latitude);
+        //   console.log("Long:- ", position.coords.longitude);
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+
+          //  ------------------------------------------------
+            //  opencagedata.com free test api key
+          const apiKey = "f7668faa7150440690799138d725d3ed";
+
+          const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude},${longitude}&key=${apiKey}`;
+
+          fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.results.length > 0) {
+                const location = data.results[0];
+                const { road,hamlet,residential,state_district,city,postcode,state,country } = location.components;
+                const result = "Your Full address is : " + road +", " + hamlet + ", " + residential + ", " + state_district + ", " + city + ", " + postcode + ", " + state + ", " + country + ", Latitude : " + latitude + ", Longitude : " + longitude;
+                para.textContent = result;
+              } else {
+                alert("Location not found.");
+              }
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+        },
+        (err) => {
+          alert("Unable to get location : check location permissions.", err.message);
+        }
+      );
+    }
+  </script>
+</html>
